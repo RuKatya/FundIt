@@ -1,5 +1,6 @@
 import React from "react";
 import { Match } from "./api";
+
 export const Matches = ({
   matches,
   search,
@@ -14,31 +15,61 @@ export const Matches = ({
     ).includes(search.toLowerCase())
   );
 
+  const score = (score: number) => {
+    if (score < 579) {
+      return <p className="match__score--scoreC">C</p>;
+    } else if (679 <= score) {
+      return <p className="match__score--scoreA">A</p>;
+    } else {
+      return <p className="match__score--scoreB">B</p>;
+    }
+  };
+
+  const toCurrency = (price: number, currency: string): any => {
+    if (currency === "NIS") {
+      currency = "ILS";
+    }
+    return new Intl.NumberFormat("NIS", {
+      currency: currency,
+      style: "currency",
+    }).format(price);
+  };
+
   return (
     <ul className="matches">
       {filteredMatches.map((match) => (
         <li key={match.id} className="match">
-          <h5 className="title">{match.companyName}</h5>
-          <div className="matchData">
+          <h5 className="match__title">{match.companyName}</h5>
+          <div className="match__matchData">
             <div>
-              <p className="userDate">
-                <b>Full Name:</b> {match.borrower.user.firstName}{" "}
-                {match.borrower.user.lastName}
+              <p className="match__matchData--userDate">
+                <b>Credit score:</b>
+                {match.borrower.creditScore}
               </p>
-              <p className="userDate">
+              <p className="match__matchData--userDate">
+                <b>Full Name:</b>
+                {`${match.borrower.user.firstName} ${match.borrower.user.lastName}`}
+              </p>
+              <p className="match__matchData--userDate">
                 <b>Email:</b> {match.borrower.user.email}
               </p>
-              <p className="userDate">
+              <p className="match__matchData--userDate">
                 <b>Amount Request: </b> {match.amountReq}
               </p>
-              <p className="userDate">
-                <b>Balance: </b> {match.borrower.financeData.balance}{" "}
-                {match.borrower.financeData.currency}
+              <p className="match__matchData--userDate">
+                <b>Balance: </b>
+                {toCurrency(
+                  match.borrower.financeData.balance,
+                  match.borrower.financeData.currency
+                )}
               </p>
             </div>
           </div>
+          <div className="match__score">
+            {score(match.borrower.creditScore)}
+          </div>
           <footer>
-            <div className="meta-data">
+            <div className="match__meta-data">
               Created At {new Date(match.creationTime).toLocaleString()}
             </div>
           </footer>

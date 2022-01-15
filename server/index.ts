@@ -34,4 +34,4 @@ app.get("/api/match", (req, res) => {
 });
 
 app.listen(PORT);
-console.log("server running", PORT);
+console.log(`server running http://localhost:${PORT}`);
