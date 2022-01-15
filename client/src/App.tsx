@@ -1,5 +1,4 @@
 import React from "react";
-// import "./App.css";
 import "./style/App.css";
 import { Matches } from "./Matches";
 import { createApiClient, Match } from "./api";
@@ -10,22 +9,27 @@ export type AppState = {
 };
 
 const api = createApiClient();
+
 const App = () => {
   const [search, setSearch] = React.useState<string>("");
   const [matches, setMatches] = React.useState<Match[]>([]);
+
   React.useEffect(() => {
     async function fetchMatches() {
       setMatches(await api.getMatches());
     }
     fetchMatches();
   }, []);
+
   let searchDebounce: any;
-  const onSearch = (val: string, newPage?: number) => {
+
+  const onSearch = (val: string) => {
     clearTimeout(searchDebounce);
     searchDebounce = setTimeout(async () => {
       setSearch(val);
     }, 300);
   };
+
   return (
     <main>
       <h1>Matches List</h1>
@@ -42,9 +46,16 @@ const App = () => {
       {matches ? (
         <Matches matches={matches} search={search} />
       ) : (
-        <h2>Loading...</h2>
+        // Loading
+        <div className="lds-ellipsis">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
       )}
     </main>
   );
 };
+
 export default App;

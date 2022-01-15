@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Match } from "./api";
+// import axios from "axios";
 
 export const Matches = ({
   matches,
@@ -11,9 +12,13 @@ export const Matches = ({
   const filteredMatches = matches.filter((t) =>
     (
       t.borrower.user.firstName.toLowerCase() +
-      t.borrower.user.lastName.toLowerCase()
+      t.borrower.user.lastName.toLowerCase() +
+      t.companyName.toLowerCase() +
+      t.borrower.user.email.toLowerCase()
     ).includes(search.toLowerCase())
   );
+
+  let [pageSize, setPageSize] = useState(5);
 
   const score = (score: number) => {
     if (score < 579) {
@@ -35,9 +40,19 @@ export const Matches = ({
     }).format(price);
   };
 
+  const changePage = () => {
+    if (pageSize < 13) {
+      setPageSize(5 + pageSize);
+    } else {
+      setPageSize(13);
+    }
+
+    console.log(pageSize);
+  };
+
   return (
     <ul className="matches">
-      {filteredMatches.map((match) => (
+      {filteredMatches.slice(0, pageSize).map((match) => (
         <li key={match.id} className="match">
           <h5 className="match__title">{match.companyName}</h5>
           <div className="match__matchData">
@@ -75,6 +90,7 @@ export const Matches = ({
           </footer>
         </li>
       ))}
+      <button onClick={changePage}>Show more</button>
     </ul>
   );
 };
