@@ -1,6 +1,6 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { Match } from "./api";
-// import axios from "axios";
 
 export const Matches = ({
   matches,
@@ -9,7 +9,11 @@ export const Matches = ({
   matches: Match[];
   search: string;
 }) => {
-  const filteredMatches = matches.filter((t) =>
+  const [pageSize, setPageSize] = useState(5);
+  const [flag, setFlag] = useState(true);
+  const [apvDecCount, setapvDecCount] = useState(0);
+
+  let filteredMatches = matches.filter((t) =>
     (
       t.borrower.user.firstName.toLowerCase() +
       t.borrower.user.lastName.toLowerCase() +
@@ -17,8 +21,6 @@ export const Matches = ({
       t.borrower.user.email.toLowerCase()
     ).includes(search.toLowerCase())
   );
-
-  let [pageSize, setPageSize] = useState(5);
 
   const score = (score: number) => {
     if (score < 579) {
@@ -30,7 +32,7 @@ export const Matches = ({
     }
   };
 
-  const toCurrency = (price: number, currency: string): any => {
+  const toCurrency = (price: number, currency: string) => {
     if (currency === "NIS") {
       currency = "ILS";
     }
@@ -45,13 +47,43 @@ export const Matches = ({
       setPageSize(5 + pageSize);
     } else {
       setPageSize(13);
+      setFlag(false);
     }
 
     console.log(pageSize);
   };
 
+  let dataServer;
+
+  const fun = (id: string) => {
+    setapvDecCount(1 + apvDecCount);
+
+    axios
+      .post(`http://localhost:8888/del`, {
+        id,
+      })
+      .then((data) => {
+        dataServer = data;
+        console.log(dataServer);
+        return dataServer;
+      })
+      .then(getData);
+  };
+
+  const getData = (dataServer: any) => {
+    filteredMatches = dataServer.filter((t: any) =>
+      (
+        t.borrower.user.firstName.toLowerCase() +
+        t.borrower.user.lastName.toLowerCase() +
+        t.companyName.toLowerCase() +
+        t.borrower.user.email.toLowerCase()
+      ).includes(search.toLowerCase())
+    );
+  };
+
   return (
     <ul className="matches">
+      <p>Approve and Decline matches: {apvDecCount} </p>
       {filteredMatches.slice(0, pageSize).map((match) => (
         <li key={match.id} className="match">
           <h5 className="match__title">{match.companyName}</h5>
@@ -83,6 +115,20 @@ export const Matches = ({
           <div className="match__score">
             {score(match.borrower.creditScore)}
           </div>
+          <div className="match__btnApvDec">
+            <button
+              className="match__btnApvDec--apr"
+              onClick={() => fun(match.id)}
+            >
+              Approve
+            </button>
+            <button
+              className="match__btnApvDec--dec"
+              onClick={() => fun(match.id)}
+            >
+              Decline
+            </button>
+          </div>
           <footer>
             <div className="match__meta-data">
               Created At {new Date(match.creationTime).toLocaleString()}
@@ -90,7 +136,15 @@ export const Matches = ({
           </footer>
         </li>
       ))}
-      <button onClick={changePage}>Show more</button>
+      <button
+        className="match__showMoreBtn"
+        onClick={changePage}
+        style={{
+          display: flag === true ? "block" : "none",
+        }}
+      >
+        Show more
+      </button>
     </ul>
   );
 };

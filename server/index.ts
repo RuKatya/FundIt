@@ -24,5 +24,14 @@ app.get("/api/match", (req, res) => {
   res.send(tempData);
 });
 
+app.post("/del", (req, res) => {
+  const id = req.body.id
+  console.log(`getted ${id}`)
+
+  console.log(tempData.length)
+  console.log(tempData.filter((n: any) => n.id !== id).length)
+  res.send(tempData.filter((n: any) => n.id !== id))
+})
+
 app.listen(PORT);
 console.log(`server running http://localhost:${PORT}`);

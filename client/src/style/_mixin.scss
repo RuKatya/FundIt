@@ -1,4 +1,12 @@
-@mixin border($color:black) {
+@mixin scoreBorder($color:black) {
     border: 1px solid $color;
     border-radius: 50%;
+}
+
+@mixin btn ($color:white, $trasition:all 0.3s) {
+    border: none;
+    color: $color;
+    padding: 1%;
+    border-radius: 0.4em;
+    transition: all 0.3s;
 }
